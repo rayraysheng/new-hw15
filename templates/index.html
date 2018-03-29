@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Belly Button Biodiversity</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!--    <link rel="stylesheet" type="text/css" href="style.css"> -->
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+    <select id="selDataset" onchange="optionChanged(this.value)"></select>
+
+    <div id="pieChart"></div>
+    <div id="bubbleChart"></div>
+    <div id="metadata">
+        <table>
+            <th>
+                <td colspan="2"><h3>Metadata</h3></td>
+            </th>
+            <tr>
+                <td>Age</td>
+                <td id="ageField"></td>
+            </tr>
+            <tr>
+                <td>BBtype</td>
+                <td id="bbtypeField"></td>
+            </tr>
+            <tr>
+                <td>Ethnicity</td>
+                <td id="ethnicityField"></td>
+            </tr>
+            <tr>
+                <td>Gender</td>
+                <td id="genderField"></td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td id="locationField"></td>
+            </tr>
+            <tr>
+                <td>SampleID</td>
+                <td id="sampleidField"></td>
+            </tr>
+        </table>
+    </div>
+    <div id="testing"></div>
+
+    <script>
+        // Grab the list of sample names and populate the dropdown menu
+        Plotly.d3.json("/names", function(error, nameData){
+            if (error) return console.warn(error);
+            
+            // Loop through all the names
+            for (i = 0; i < nameData.length; i++){
+                
+                // Create an option for each name
+                var optionEl = document.createElement("option");
+                optionEl.text = nameData[i];
+                optionEl.value = nameData[i];
+                
+                // Add the option to the dropdown
+                var selectEl = document.getElementById("selDataset")
+                selectEl.appendChild(optionEl)
+            }   
+        })
+
+        optionChanged = function(sampleName){
+            // Debugging
+            console.log(`/samples/${sampleName}`);
+            
+            // First grab the sample data using the name passed from dropdown option
+            Plotly.d3.json(`/samples/${sampleName}`, function(error, sampleData){
+                if (error) return console.warn(error);
+                
+                //console.log(sampleData[0]);
+                var otuIdsArr = sampleData[0]['otu_ids'];
+                var sampleValuesArr = sampleData[0]['sample_values'];
+                //console.log(otuIdsArr);
+                //console.log(sampleValuesArr);
+                
+                // Slice down to just 10 records
+                var otuIdsToPlot = otuIdsArr.slice(0, 10)
+                var sampleValuesToPlot = sampleValuesArr.slice(0, 10)
+                //console.log(otuIdsToPlot)
+                //console.log(sampleValuesToPlot)
+                
+                // Now grab the otu labels
+                Plotly.d3.json(`/otu`, function(error, otuData){
+                    if (error) return console.warn(error);
+                    
+                    // Match otu ids to labels
+                    otuPieLabels = otuIdsToPlot.map(i => otuData[i - 1]);
+                    otuBubbleDescs = otuIdsArr.map(i => otuData[i - 1]);
+                    
+                    // Make the pie chart
+                    var trace1 = {
+                        labels: otuPieLabels,
+                        values: sampleValuesToPlot,
+                        type: 'pie'
+                    };
+
+                    var data = [trace1];
+                    var layout = {
+                        title: 'Belly Button Biodiversity',
+                    };
+
+                    Plotly.newPlot('pieChart', data, layout);
+
+                    // Make the bubble chart
+                    var trace1 = {
+                        x: otuIdsArr,
+                        y: sampleValuesArr,
+                        mode: 'markers',
+                        marker: {
+                            size: sampleValuesArr
+                        }
+                    };
+                    
+                    var data = [trace1];
+
+                    var layout = {
+                        title: 'Belly Button Biodiversity',
+                    };
+
+                    Plotly.newPlot('bubbleChart', data, layout);
+                })
+
+
+            })
+            
+            // Grab the metadata using the same name
+            Plotly.d3.json(`/metadata/${sampleName}`, function(error, sampleMetadata){
+                if (error) return console.warn(error);
+                
+                console.log(sampleMetadata)
+                document.getElementById('ageField').innerText = sampleMetadata['AGE'];
+                document.getElementById('bbtypeField').innerText = sampleMetadata['BBTYPE'];
+                document.getElementById('ethnicityField').innerText = sampleMetadata['ETHNICITY'];
+                document.getElementById('genderField').innerText = sampleMetadata['GENDER'];
+                document.getElementById('locationField').innerText = sampleMetadata['LOCATION'];
+                document.getElementById('sampleidField').innerText = sampleMetadata['SAMPLEID'];
+            })
+        }
+    </script>
+
+</body>
