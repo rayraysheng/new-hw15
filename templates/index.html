@@ -20,33 +20,33 @@
     <div id="bubbleChart"></div>
     <div id="metadata">
         <table>
-            <th>
-                <td colspan="2"><h3>Metadata</h3></td>
-            </th>
-            <tr>
-                <td>Age</td>
-                <td id="ageField"></td>
-            </tr>
-            <tr>
-                <td>BBtype</td>
-                <td id="bbtypeField"></td>
-            </tr>
-            <tr>
-                <td>Ethnicity</td>
-                <td id="ethnicityField"></td>
-            </tr>
-            <tr>
-                <td>Gender</td>
-                <td id="genderField"></td>
-            </tr>
-            <tr>
-                <td>Location</td>
-                <td id="locationField"></td>
-            </tr>
-            <tr>
-                <td>SampleID</td>
-                <td id="sampleidField"></td>
-            </tr>
+            <th><tr><td colspan="2"><h4>Metadata</h4></td></tr></th>
+            <tbody>
+                <tr>
+                    <td>Age</td>
+                    <td id="age"></td>
+                </tr>
+                <tr>
+                    <td>BBType</td>
+                    <td id="bbtype"></td>
+                </tr>
+                <tr>
+                    <td>Ethnicity</td>
+                    <td id="ethnicity"></td>
+                </tr>
+                <tr>
+                    <td>Gender</td>
+                    <td id="gender"></td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td id="location"></td>
+                </tr>
+                <tr>
+                    <td>SampleID</td>
+                    <td id="sampleid"></td>
+                </tr>
+            </tbody>
         </table>
     </div>
     <div id="testing"></div>
@@ -108,6 +108,7 @@
                     var data = [trace1];
                     var layout = {
                         title: 'Belly Button Biodiversity',
+                        showlegend: false
                     };
 
                     Plotly.newPlot('pieChart', data, layout);
@@ -116,6 +117,7 @@
                     var trace1 = {
                         x: otuIdsArr,
                         y: sampleValuesArr,
+                        text: otuBubbleDescs,
                         mode: 'markers',
                         marker: {
                             size: sampleValuesArr
@@ -139,12 +141,12 @@
                 if (error) return console.warn(error);
                 
                 console.log(sampleMetadata)
-                document.getElementById('ageField').innerText = sampleMetadata['AGE'];
-                document.getElementById('bbtypeField').innerText = sampleMetadata['BBTYPE'];
-                document.getElementById('ethnicityField').innerText = sampleMetadata['ETHNICITY'];
-                document.getElementById('genderField').innerText = sampleMetadata['GENDER'];
-                document.getElementById('locationField').innerText = sampleMetadata['LOCATION'];
-                document.getElementById('sampleidField').innerText = sampleMetadata['SAMPLEID'];
+                document.getElementById("age").innerText = sampleMetadata['AGE'];
+                document.getElementById("bbtype").innerText = sampleMetadata['BBTYPE'];
+                document.getElementById("ethnicity").innerText = sampleMetadata['ETHNICITY'];
+                document.getElementById("gender").innerText = sampleMetadata['GENDER'];
+                document.getElementById("location").innerText = sampleMetadata['LOCATION'];
+                document.getElementById("sampleid").innerText = sampleMetadata['SAMPLEID'];
             })
         }
     </script>
